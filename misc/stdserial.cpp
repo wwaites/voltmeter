@@ -16,7 +16,7 @@ static int uart_putchar (char c, FILE *stream)
     return 0 ;
 }
 
-void stdio_init(void)
+void tty_init(void)
 {
    // Start the UART
    Serial.begin(9600) ;
