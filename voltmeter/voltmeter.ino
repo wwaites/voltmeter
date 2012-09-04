@@ -37,10 +37,10 @@ float scaling = 5.0 * (R1 + R2) / R2 / 1024;
  * of the generation of the readings, i.e. the overflow
  * of the circular buffer
  */
-#define NREADINGS 300
-int voltage[NREADINGS];
-byte vptr = 0;
-int gen = 0;
+#define NREADINGS 240
+unsigned int voltage[NREADINGS];
+unsigned int vptr = 0;
+unsigned int gen = 0;
 
 /* Configuration for the web server */
 static unsigned char mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0x00, 0x01 };
@@ -79,8 +79,7 @@ void getVoltage(WebServer &server, WebServer::ConnectionType type, char *, bool)
 	/* a counter, and save values to vptr
 	   in case the interrupt service routine
 	   changes them out from underneath us */
-	byte i, vptrx = vptr;
-	int genx = gen;
+	unsigned int i, vptrx = vptr, genx = gen;
 
 	/* if we are not the first iteration through
 	   the list, start at the current pointer location
@@ -93,7 +92,7 @@ void getVoltage(WebServer &server, WebServer::ConnectionType type, char *, bool)
 	}
 
 	for (;;) {
-	    int thisgen;
+	    unsigned int thisgen;
 	    if (i < vptrx) {
 		thisgen = genx;
 	    } else {
@@ -101,7 +100,7 @@ void getVoltage(WebServer &server, WebServer::ConnectionType type, char *, bool)
 	    }
 
 	    memset(buf, 0, sizeof(buf));
-	    snprintf(buf, sizeof(buf), "\t(%d,", thisgen * NREADINGS + i);
+	    snprintf(buf, sizeof(buf), "\t(%u,", (unsigned long)thisgen * NREADINGS + i);
 	    server.print(buf);
 
 	    memset(buf, 0, sizeof(buf));
