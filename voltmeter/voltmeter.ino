@@ -37,16 +37,18 @@ float scaling = 5.0 * (R1 + R2) / R2 / 1024;
  * of the generation of the readings, i.e. the overflow
  * of the circular buffer
  */
-#define NREADINGS 120
-float voltage[NREADINGS];
+#define NREADINGS 300
+int voltage[NREADINGS];
 byte vptr = 0;
 int gen = 0;
 
 /* Configuration for the web server */
 static unsigned char mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0x00, 0x01 };
 static unsigned char ip[] = { 192, 168, 1, 16 };
-WebServer webserver("", 80);
+static unsigned char nameserver[] = { 8, 8, 8, 8 };
+static unsigned char gateway[] = { 192, 168, 1, 1 };
 
+WebServer webserver("", 80);
 
 /* 
  * Interrupt Service Routine -- take a voltage reading and
@@ -56,7 +58,7 @@ ISR(TIMER1_COMPA_vect) {
     int reading = analogRead(VOLTAGE_PIN);
     float v = reading * scaling;
 
-    voltage[vptr++] = v;
+    voltage[vptr++] = (int)v * 100 + (int)(v * 100) % 100;
     if (vptr == NREADINGS) {
 	vptr = 0;
 	gen += 1;
@@ -103,7 +105,7 @@ void getVoltage(WebServer &server, WebServer::ConnectionType type, char *, bool)
 	    server.print(buf);
 
 	    memset(buf, 0, sizeof(buf));
-	    snprintf(buf, sizeof(buf), " %.2f)", voltage[i]);
+	    snprintf(buf, sizeof(buf), " %d.%02d)", voltage[i] / 100, voltage[i] % 100);
 	    server.print(buf);
 
 	    i++;
@@ -134,7 +136,7 @@ void setup() {
     TCCR1A = 0;
     TCCR1B = 0;
 
-    OCR1A = 15624 * 2; // every two seconds
+    OCR1A = 15624; // every second
     // turn on CTC mode
     TCCR1B |= (1 <<WGM12);  // CTC mode
     // set CS10 and CS12 bits for 1024x prescaler
@@ -146,7 +148,7 @@ void setup() {
     // ENABLE INTERRUPTS
     sei();
    
-    Ethernet.begin(mac, ip);
+    Ethernet.begin(mac, ip, nameserver, gateway);
     webserver.setDefaultCommand(&getVoltage);
     webserver.begin();
 }
