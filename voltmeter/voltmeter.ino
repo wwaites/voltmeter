@@ -100,11 +100,11 @@ void getVoltage(WebServer &server, WebServer::ConnectionType type, char *, bool)
 	    }
 
 	    memset(buf, 0, sizeof(buf));
-	    snprintf(buf, sizeof(buf), "\t(%u,", (unsigned long)thisgen * NREADINGS + i);
+	    snprintf(buf, sizeof(buf), "\t[%u, ", (unsigned long)thisgen * NREADINGS + i);
 	    server.print(buf);
 
 	    memset(buf, 0, sizeof(buf));
-	    snprintf(buf, sizeof(buf), " %d.%02d)", voltage[i] / 100, voltage[i] % 100);
+	    snprintf(buf, sizeof(buf), "%d.%02d]", voltage[i] / 100, voltage[i] % 100);
 	    server.print(buf);
 
 	    i++;
