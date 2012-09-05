@@ -40,13 +40,14 @@ float scaling = 5.0 * (R1 + R2) / R2 / 1024;
 #define NREADINGS 240
 unsigned int voltage[NREADINGS];
 unsigned int vptr = 0;
-unsigned int gen = 0;
+unsigned int gen  = 0;
 
 /* Configuration for the web server */
-static unsigned char mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0x00, 0x01 };
-static unsigned char ip[] = { 192, 168, 1, 16 };
-static unsigned char nameserver[] = { 8, 8, 8, 8 };
-static unsigned char gateway[] = { 192, 168, 1, 1 };
+static unsigned char mac[]        = { 0x74, 0x65, 0x67, 0x6F, 0x6C, 0x61 };
+static unsigned char ip[]         = { 10, 11, 12, 23 };
+static unsigned char nameserver[] = { 10, 10, 10, 10 };
+static unsigned char gateway[]    = { 10, 11, 12, 17 };
+static unsigned char subnet[]     = { 255, 255, 255, 240 };
 
 WebServer webserver("", 80);
 
@@ -147,7 +148,7 @@ void setup() {
     // ENABLE INTERRUPTS
     sei();
    
-    Ethernet.begin(mac, ip, nameserver, gateway);
+    Ethernet.begin(mac, ip, nameserver, gateway, subnet);
     webserver.setDefaultCommand(&getVoltage);
     webserver.begin();
 }
